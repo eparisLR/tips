@@ -14,6 +14,20 @@ struct IndexPageState {
 fn index_page<G: Html>(cx: Scope, state: &IndexPageStateRx) -> View<G> {
     view! { cx,
         p { (state.greeting.get()) }
+        (View::new_fragment(
+            state.tips.get()
+                .iter()
+                .enumerate()
+                .map(|(index, item)| {
+                    let item = item.clone();
+                    view! { cx,
+                        p(class = "todo-item") {
+                            (item.title)
+                        }
+                    }
+                })
+                .collect(),
+        ))
         a(href = "about", id = "about-link") { "About!" }
     }
 }
@@ -27,18 +41,14 @@ fn head(cx: Scope, _props: IndexPageState) -> View<SsrNode> {
 
 #[engine_only_fn]
 async fn get_build_state(_info: StateGeneratorInfo<()>) -> IndexPageState {
+    let client = reqwest::Client::new();
+    let tips = client.get("http://localhost:3000/tips").send().await;
     IndexPageState {
         greeting: "Hello World!".to_string(),
-        tips: get_tips().unwrap()
+        tips: tips.expect("Failed to get response").json::<Vec<Tips>>().await.expect("Failed to get tips")
     }
 }
 
-fn get_tips() ->  Result<Vec<Tips>, Box<dyn std::error::Error>> {
-    let tips = reqwest::blocking::get("http://localhost:3000/tips")?
-            .json::<Vec<Tips>>()?;
-        println!("{:#?}", tips);
-        Ok(tips)
-}
 pub fn get_template<G: Html>() -> Template<G> {
     Template::build("index")
         .build_state_fn(get_build_state)
