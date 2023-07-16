@@ -1,0 +1,12 @@
+{
+  "tips": [
+    {
+      "title": "Le Rust j'adore",
+      "url": "https://github.com/serayuzgur/weld",
+      "description": "C'est un JSON Server pour Rust !",
+      "created_at": "",
+      "tags": ["Rust"]
+    }
+  ],
+  "tags": []
+}

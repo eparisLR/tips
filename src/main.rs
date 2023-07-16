@@ -1,5 +1,6 @@
 mod templates;
 mod error_views;
+mod entity;
 
 use perseus::prelude::*;
 
